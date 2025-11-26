@@ -17,6 +17,10 @@
     <div class="container">
         <header>
             <div class="header-content">
+                <div class="user-welcome">
+                    <i class="fas fa-star"></i> مرحباً Beroo! <i class="fas fa-star"></i>
+                </div>
+                
                 <h1><i class="fas fa-gamepad"></i> مركز ألعاب Beroo</h1>
                 
                 <div class="theme-picker">
@@ -38,7 +42,7 @@
 
         <!-- Landing Page / Game Selector -->
         <div id="home-screen" class="glass-panel">
-            <h2>اخترى لعبتك يا Beroo</h2>
+            <h2>اختر لعبتك يا Beroo</h2>
             <div class="game-grid">
                 <!-- Memory Game Card -->
                 <div class="game-card" onclick="loadGame('memory')">
@@ -61,6 +65,14 @@
                     <i class="fas fa-times fa-3x" style="color: var(--accent-color); margin-bottom: 1rem;"></i>
                     <h3>إكس أو</h3>
                     <p>تحدى صديقك أو الكمبيوتر في لعبة الذكاء الخالدة.</p>
+                    <span class="btn">العب الآن</span>
+                </div>
+
+                <!-- Flappy Bird Card -->
+                <div class="game-card" onclick="loadGame('flappy')">
+                    <i class="fas fa-dove fa-3x" style="color: var(--primary-color); margin-bottom: 1rem;"></i>
+                    <h3>الطائر الطيار</h3>
+                    <p>توجيه الطائر عبر الأنابيب الخضراء وتجنب الاصطدام! كل أنبوب نقطة.</p>
                     <span class="btn">العب الآن</span>
                 </div>
             </div>
@@ -105,5 +117,6 @@
     <script src="games/memory.js"></script>
     <script src="games/snake.js"></script>
     <script src="games/tictactoe.js"></script>
+    <script src="games/flappy.js"></script>
 </body>
 </html>
