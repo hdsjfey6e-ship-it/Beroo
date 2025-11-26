@@ -527,13 +527,29 @@ footer {
 }
 
 @media (max-width: 600px) {
+    .container {
+        padding: 1rem;
+        width: 100%;
+        overflow-x: hidden; /* Prevent horizontal scroll */
+    }
+
     .header-content {
         flex-direction: column;
         gap: 1rem;
+        padding-bottom: 1rem;
+    }
+
+    .logo h1 {
+        font-size: 2rem;
+    }
+
+    .theme-picker {
+        margin: 0.5rem 0;
     }
 
     .game-grid {
         grid-template-columns: 1fr; /* Stack cards on mobile */
+        gap: 1.5rem;
     }
 
     /* Snake Canvas Responsive */
@@ -546,37 +562,46 @@ footer {
 
     /* Memory Grid Responsive */
     .memory-grid {
-        grid-template-columns: repeat(4, 70px); /* Smaller cards */
-        gap: 10px;
+        grid-template-columns: repeat(4, 1fr); /* Use fraction to fit width */
+        gap: 8px;
+        max-width: 100%;
     }
     
     .memory-grid.hard-grid {
-        grid-template-columns: repeat(4, 60px); /* 4 cols for hard mode on mobile, will wrap */
+        grid-template-columns: repeat(4, 1fr); /* 4 cols for hard mode on mobile */
     }
 
     .memory-card {
-        width: 70px;
-        height: 70px;
+        width: auto; /* Let grid define width */
+        height: auto;
+        aspect-ratio: 1/1; /* Keep square */
     }
     
-    .memory-card.small {
-        width: 60px;
-        height: 60px;
+    .front-face, .back-face {
+        font-size: 1.5rem;
     }
 
     /* Tic Tac Toe Responsive */
     .ttt-grid {
-        grid-template-columns: repeat(3, 80px);
+        grid-template-columns: repeat(3, 1fr);
         gap: 10px;
+        max-width: 300px; /* Limit width */
     }
 
     .ttt-cell {
-        width: 80px;
-        height: 80px;
-        font-size: 2.5rem;
+        width: auto;
+        height: auto;
+        aspect-ratio: 1/1;
+        font-size: 2rem;
     }
     
     .horizontal-controls {
         gap: 3rem; /* More space for thumbs */
+    }
+    
+    /* Stats Modal on Mobile */
+    .modal-content {
+        width: 95%;
+        padding: 1.5rem;
     }
 }
