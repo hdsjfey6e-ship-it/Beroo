@@ -1,4 +1,4 @@
-// Snake Game Logic
+// Snake Game Logic - Enhanced
 
 let snakeCanvas, snakeCtx;
 let snake = [];
@@ -8,11 +8,14 @@ let snakeNextDirection = 'RIGHT';
 let snakeScore = 0;
 let snakeGameLoop;
 let snakeSpeed = 150;
-const box = 20; // Size of one grid unit
+const box = 20;
 
-let snakeDifficulty = 'NORMAL'; // SLOW, NORMAL, FAST
-
+let snakeDifficulty = 'NORMAL';
 let snakePaused = false;
+let specialFood = null;
+let specialFoodTimer = 0;
+let obstacles = [];
+let gameStarted = false;
 
 function initSnakeGame() {
     const bestScore = scoreMgr.getScore('snake');
@@ -26,29 +29,36 @@ function initSnakeGame() {
                 <p class="best-score">الأفضل: <span>${bestScore}</span></p>
             </div>
             
-            <div class="game-settings" style="margin-bottom: 1rem;">
-                <label style="color: #ccc; margin-left: 10px;">السرعة:</label>
-                <select id="snake-speed" onchange="setSnakeSpeed(this.value)" style="padding: 5px; border-radius: 5px; background: rgba(255,255,255,0.1); color: #fff; border: 1px solid var(--secondary-color);">
-                    <option value="SLOW" ${snakeDifficulty === 'SLOW' ? 'selected' : ''}>بطيء (سهل)</option>
-                    <option value="NORMAL" ${snakeDifficulty === 'NORMAL' ? 'selected' : ''}>عادي</option>
-                    <option value="FAST" ${snakeDifficulty === 'FAST' ? 'selected' : ''}>سريع (محترف)</option>
-                </select>
-                <button class="btn-sm" onclick="toggleSnakePause()" style="margin-right: 10px;" title="إيقاف مؤقت (P)"><i class="fas fa-pause"></i></button>
-                <button class="btn-sm" onclick="showInstructions('snake')" style="margin-right: 5px;"><i class="fas fa-info-circle"></i></button>
+            <div class="game-settings" style="margin-bottom: 1rem; display: flex; justify-content: center; align-items: center; gap: 1rem; flex-wrap: wrap;">
+                <div>
+                    <label style="color: #ccc; margin-left: 10px;">السرعة:</label>
+                    <select id="snake-speed" onchange="setSnakeSpeed(this.value)" style="padding: 5px; border-radius: 5px; background: rgba(255,255,255,0.1); color: #fff; border: 1px solid var(--secondary-color);">
+                        <option value="SLOW" ${snakeDifficulty === 'SLOW' ? 'selected' : ''}>بطيء (سهل)</option>
+                        <option value="NORMAL" ${snakeDifficulty === 'NORMAL' ? 'selected' : ''}>عادي</option>
+                        <option value="FAST" ${snakeDifficulty === 'FAST' ? 'selected' : ''}>سريع (محترف)</option>
+                    </select>
+                </div>
+                <button class="btn-sm" onclick="toggleSnakePause()" title="إيقاف مؤقت (P)">
+                    <i class="fas fa-pause"></i> إيقاف
+                </button>
+                <button class="btn-sm" onclick="showInstructions('snake')">
+                    <i class="fas fa-info-circle"></i> التعليمات
+                </button>
             </div>
-        </div>
+            <div id="snake-powerup" style="color: gold; font-size: 0.9rem; margin-top: 0.5rem; display: none;">
+                <i class="fas fa-bolt"></i> طعام خاص نشط!
             </div>
         </div>
         <div style="position: relative; width: fit-content; margin: 0 auto;">
             <canvas id="snake-canvas" width="400" height="400"></canvas>
             
             <!-- Start Overlay -->
-            <div id="snake-overlay" onclick="startSnakeGame()" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); display: flex; justify-content: center; align-items: center; cursor: pointer; border-radius: 10px; z-index: 10;">
+            <div id="snake-overlay" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); display: flex; justify-content: center; align-items: center; cursor: pointer; border-radius: 10px; z-index: 10;">
                 <h2 style="color: #fff; text-shadow: 0 0 10px var(--primary-color);">اضغط للبدء 🐍</h2>
             </div>
 
             <!-- Pause Overlay -->
-            <div id="snake-paused-overlay" onclick="toggleSnakePause()" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); display: none; justify-content: center; align-items: center; cursor: pointer; border-radius: 10px; z-index: 10;">
+            <div id="snake-paused-overlay" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); display: none; justify-content: center; align-items: center; cursor: pointer; border-radius: 10px; z-index: 10;">
                 <h2 style="color: #fff; text-shadow: 0 0 10px var(--secondary-color);">موقوف ⏸️</h2>
             </div>
         </div>
@@ -72,6 +82,9 @@ function initSnakeGame() {
     snakeNextDirection = 'RIGHT';
     snakeScore = 0;
     snakePaused = false;
+    gameStarted = false;
+    specialFood = null;
+    obstacles = [];
 
     // Set Speed based on difficulty
     if (snakeDifficulty === 'SLOW') snakeSpeed = 200;
@@ -79,33 +92,36 @@ function initSnakeGame() {
     else if (snakeDifficulty === 'FAST') snakeSpeed = 80;
 
     spawnFood();
+    spawnObstacles();
 
-    // Draw initial state (static)
-    drawSnakeGame(true); // Pass true to indicate static draw (no move)
+    // Draw initial state
+    drawSnakeGame(true);
 
-    // Keyboard Controls
+    // Event listeners
     document.addEventListener('keydown', handleSnakeInput);
+    document.getElementById('snake-overlay').addEventListener('click', startSnakeGame);
 
-    // Touch Controls (Swipe)
-    const canvas = document.getElementById('snake-canvas');
-    canvas.addEventListener('touchstart', handleTouchStart, { passive: false });
-    canvas.addEventListener('touchmove', handleTouchMove, { passive: false });
+    // Touch Controls
+    snakeCanvas.addEventListener('touchstart', handleTouchStart, { passive: false });
+    snakeCanvas.addEventListener('touchmove', handleTouchMove, { passive: false });
 
     // Stop any existing loop
     clearInterval(snakeGameLoop);
 }
 
 function startSnakeGame() {
-    const overlay = document.getElementById('snake-overlay');
-    if (overlay) {
-        overlay.style.display = 'none';
-    }
+    if (gameStarted) return;
+    
+    document.getElementById('snake-overlay').style.display = 'none';
+    gameStarted = true;
     audioSys.playClick();
     clearInterval(snakeGameLoop);
     snakeGameLoop = setInterval(drawSnakeGame, snakeSpeed);
 }
 
 function toggleSnakePause() {
+    if (!gameStarted) return;
+    
     const overlay = document.getElementById('snake-paused-overlay');
     if (!snakePaused) {
         snakePaused = true;
@@ -126,7 +142,7 @@ function handleTouchStart(evt) {
     const firstTouch = evt.touches[0];
     xDown = firstTouch.clientX;
     yDown = firstTouch.clientY;
-    evt.preventDefault(); // Prevent scrolling while playing
+    evt.preventDefault();
 }
 
 function handleTouchMove(evt) {
@@ -141,14 +157,12 @@ function handleTouchMove(evt) {
     let yDiff = yDown - yUp;
 
     if (Math.abs(xDiff) > Math.abs(yDiff)) {
-        // Horizontal Swipe
         if (xDiff > 0) {
             setDirection('LEFT');
         } else {
             setDirection('RIGHT');
         }
     } else {
-        // Vertical Swipe
         if (yDiff > 0) {
             setDirection('UP');
         } else {
@@ -156,7 +170,6 @@ function handleTouchMove(evt) {
         }
     }
 
-    // Reset values
     xDown = null;
     yDown = null;
     evt.preventDefault();
@@ -164,8 +177,6 @@ function handleTouchMove(evt) {
 
 function setSnakeSpeed(speed) {
     snakeDifficulty = speed;
-    // Restart game with new speed
-    document.getElementById('snake-canvas').focus(); // Keep focus
     initSnakeGame();
 }
 
@@ -177,6 +188,10 @@ function stopSnakeGame() {
         canvas.removeEventListener('touchstart', handleTouchStart);
         canvas.removeEventListener('touchmove', handleTouchMove);
     }
+    const overlay = document.getElementById('snake-overlay');
+    if (overlay) {
+        overlay.removeEventListener('click', startSnakeGame);
+    }
 }
 
 function handleSnakeInput(e) {
@@ -185,7 +200,7 @@ function handleSnakeInput(e) {
         return;
     }
 
-    if (snakePaused) return; // Don't allow move if paused
+    if (snakePaused || !gameStarted) return;
 
     if (e.key === 'ArrowLeft') setDirection('LEFT');
     else if (e.key === 'ArrowUp') setDirection('UP');
@@ -205,6 +220,39 @@ function spawnFood() {
         x: Math.floor(Math.random() * (snakeCanvas.width / box)) * box,
         y: Math.floor(Math.random() * (snakeCanvas.height / box)) * box
     };
+    
+    // Occasionally spawn special food
+    if (Math.random() < 0.2 && snakeScore > 5) {
+        specialFood = {
+            x: Math.floor(Math.random() * (snakeCanvas.width / box)) * box,
+            y: Math.floor(Math.random() * (snakeCanvas.height / box)) * box,
+            type: Math.random() < 0.5 ? 'speed' : 'points'
+        };
+        specialFoodTimer = 300; // 300 frames ~ 15 seconds
+    }
+}
+
+function spawnObstacles() {
+    obstacles = [];
+    const obstacleCount = Math.floor(snakeScore / 10) + 2;
+    
+    for (let i = 0; i < obstacleCount; i++) {
+        let obstacle;
+        let validPosition = false;
+        
+        while (!validPosition) {
+            obstacle = {
+                x: Math.floor(Math.random() * (snakeCanvas.width / box)) * box,
+                y: Math.floor(Math.random() * (snakeCanvas.height / box)) * box
+            };
+            
+            // Check if obstacle doesn't overlap with snake or food
+            validPosition = !collision(obstacle.x, obstacle.y, snake) && 
+                           (obstacle.x !== food.x || obstacle.y !== food.y);
+        }
+        
+        obstacles.push(obstacle);
+    }
 }
 
 function collision(headX, headY, array) {
@@ -217,7 +265,7 @@ function collision(headX, headY, array) {
 }
 
 function drawSnakeGame(isStatic = false) {
-    if (!isStatic) {
+    if (!isStatic && gameStarted && !snakePaused) {
         snakeDirection = snakeNextDirection;
 
         // Move Snake
@@ -229,8 +277,9 @@ function drawSnakeGame(isStatic = false) {
         if (snakeDirection === 'RIGHT') snakeX += box;
         if (snakeDirection === 'DOWN') snakeY += box;
 
-        // Check Collision (Walls or Self)
-        if (snakeX < 0 || snakeX >= snakeCanvas.width || snakeY < 0 || snakeY >= snakeCanvas.height || collision(snakeX, snakeY, snake)) {
+        // Check Collision (Walls, Self, or Obstacles)
+        if (snakeX < 0 || snakeX >= snakeCanvas.width || snakeY < 0 || snakeY >= snakeCanvas.height || 
+            collision(snakeX, snakeY, snake) || collision(snakeX, snakeY, obstacles)) {
             clearInterval(snakeGameLoop);
             audioSys.playLose();
 
@@ -247,8 +296,8 @@ function drawSnakeGame(isStatic = false) {
             snakeCtx.font = '20px Outfit';
             snakeCtx.fillText('النقاط: ' + snakeScore, snakeCanvas.width / 2, snakeCanvas.height / 2 + 20);
 
-            if (isRecord) {
-                fireConfetti(); // Celebration
+            if (isRecord && snakeScore > 0) {
+                fireConfetti();
                 snakeCtx.fillStyle = '#00fff2';
                 snakeCtx.fillText('رقم قياسي جديد! 🏆', snakeCanvas.width / 2, snakeCanvas.height / 2 + 60);
             }
@@ -256,61 +305,177 @@ function drawSnakeGame(isStatic = false) {
         }
 
         // Eat Food
+        let ateFood = false;
         if (snakeX === food.x && snakeY === food.y) {
             snakeScore++;
             document.getElementById('snake-score').innerText = snakeScore;
-            audioSys.playWin(); // Use click sound for eating for now, or add specific eat sound
+            audioSys.playWin();
             spawnFood();
+            spawnObstacles();
+            ateFood = true;
+            
             // Increase speed slightly
             if (snakeSpeed > 50) {
                 clearInterval(snakeGameLoop);
                 snakeSpeed -= 2;
                 snakeGameLoop = setInterval(drawSnakeGame, snakeSpeed);
             }
-        } else {
+        }
+        
+        // Eat Special Food
+        if (specialFood && snakeX === specialFood.x && snakeY === specialFood.y) {
+            if (specialFood.type === 'speed') {
+                // Speed boost
+                clearInterval(snakeGameLoop);
+                snakeSpeed = Math.max(30, snakeSpeed - 30);
+                snakeGameLoop = setInterval(drawSnakeGame, snakeSpeed);
+                document.getElementById('snake-powerup').style.display = 'block';
+                setTimeout(() => {
+                    document.getElementById('snake-powerup').style.display = 'none';
+                }, 3000);
+            } else {
+                // Points boost
+                snakeScore += 5;
+                document.getElementById('snake-score').innerText = snakeScore;
+            }
+            specialFood = null;
+            audioSys.playPoint();
+        }
+
+        if (!ateFood) {
             snake.pop();
         }
 
         let newHead = { x: snakeX, y: snakeY };
         snake.unshift(newHead);
+        
+        // Update special food timer
+        if (specialFood) {
+            specialFoodTimer--;
+            if (specialFoodTimer <= 0) {
+                specialFood = null;
+            }
+        }
     }
 
-    // Draw Background
-    snakeCtx.fillStyle = 'rgba(0, 0, 0, 0.5)';
+    // Draw Background with gradient
+    const gradient = snakeCtx.createLinearGradient(0, 0, snakeCanvas.width, snakeCanvas.height);
+    gradient.addColorStop(0, '#1a1a2e');
+    gradient.addColorStop(1, '#16213e');
+    snakeCtx.fillStyle = gradient;
     snakeCtx.fillRect(0, 0, snakeCanvas.width, snakeCanvas.height);
+
+    // Draw Grid (subtle)
+    snakeCtx.strokeStyle = 'rgba(255, 255, 255, 0.05)';
+    snakeCtx.lineWidth = 1;
+    for (let x = 0; x < snakeCanvas.width; x += box) {
+        snakeCtx.beginPath();
+        snakeCtx.moveTo(x, 0);
+        snakeCtx.lineTo(x, snakeCanvas.height);
+        snakeCtx.stroke();
+    }
+    for (let y = 0; y < snakeCanvas.height; y += box) {
+        snakeCtx.beginPath();
+        snakeCtx.moveTo(0, y);
+        snakeCtx.lineTo(snakeCanvas.width, y);
+        snakeCtx.stroke();
+    }
+
+    // Draw Obstacles
+    snakeCtx.fillStyle = '#7b2cbf';
+    snakeCtx.shadowBlur = 10;
+    snakeCtx.shadowColor = '#7b2cbf';
+    for (let obstacle of obstacles) {
+        snakeCtx.fillRect(obstacle.x, obstacle.y, box, box);
+    }
 
     // Draw Food
     snakeCtx.fillStyle = '#ff00de';
-    snakeCtx.shadowBlur = 10;
+    snakeCtx.shadowBlur = 15;
     snakeCtx.shadowColor = '#ff00de';
     snakeCtx.beginPath();
     snakeCtx.arc(food.x + box / 2, food.y + box / 2, box / 2 - 2, 0, Math.PI * 2);
     snakeCtx.fill();
-    snakeCtx.shadowBlur = 0;
+
+    // Draw Special Food
+    if (specialFood) {
+        snakeCtx.fillStyle = specialFood.type === 'speed' ? '#00ff00' : 'gold';
+        snakeCtx.shadowBlur = 15;
+        snakeCtx.shadowColor = specialFood.type === 'speed' ? '#00ff00' : 'gold';
+        snakeCtx.beginPath();
+        snakeCtx.arc(specialFood.x + box / 2, specialFood.y + box / 2, box / 2 - 1, 0, Math.PI * 2);
+        snakeCtx.fill();
+        
+        // Pulsing effect
+        const pulse = Math.sin(Date.now() / 200) * 2 + 2;
+        snakeCtx.shadowBlur = 10 + pulse;
+    }
 
     // Draw Snake
     for (let i = 0; i < snake.length; i++) {
-        snakeCtx.fillStyle = (i === 0) ? '#00fff2' : '#00ccbf';
+        const segment = snake[i];
+        const isHead = i === 0;
+        
+        // Gradient for snake segments
+        const segmentGradient = snakeCtx.createRadialGradient(
+            segment.x + box/2, segment.y + box/2, 0,
+            segment.x + box/2, segment.y + box/2, box/2
+        );
+        
+        if (isHead) {
+            segmentGradient.addColorStop(0, '#00fff2');
+            segmentGradient.addColorStop(1, '#00a8a8');
+        } else {
+            const intensity = 1 - (i / snake.length) * 0.5;
+            segmentGradient.addColorStop(0, `rgba(0, ${255 * intensity}, ${242 * intensity}, 1)`);
+            segmentGradient.addColorStop(1, `rgba(0, ${168 * intensity}, ${168 * intensity}, 1)`);
+        }
+        
+        snakeCtx.fillStyle = segmentGradient;
+        snakeCtx.shadowBlur = isHead ? 15 : 5;
+        snakeCtx.shadowColor = isHead ? '#00fff2' : '#00ccbf';
 
         // Rounded Segments
-        let x = snake[i].x;
-        let y = snake[i].y;
-        let size = box - 2;
-        let radius = (i === 0) ? 5 : 2; // Head is rounder
-
+        let radius = isHead ? 8 : 4;
         snakeCtx.beginPath();
-        snakeCtx.roundRect(x + 1, y + 1, size, size, radius);
+        snakeCtx.roundRect(segment.x + 1, segment.y + 1, box - 2, box - 2, radius);
         snakeCtx.fill();
 
         // Draw Eyes for Head
-        if (i === 0) {
+        if (isHead) {
             snakeCtx.fillStyle = 'black';
             let eyeSize = 3;
 
+            // Adjust eye position based on direction
+            let leftEyeX, leftEyeY, rightEyeX, rightEyeY;
+            
+            switch(snakeDirection) {
+                case 'RIGHT':
+                    leftEyeX = segment.x + 14; leftEyeY = segment.y + 8;
+                    rightEyeX = segment.x + 14; rightEyeY = segment.y + 14;
+                    break;
+                case 'LEFT':
+                    leftEyeX = segment.x + 6; leftEyeY = segment.y + 8;
+                    rightEyeX = segment.x + 6; rightEyeY = segment.y + 14;
+                    break;
+                case 'UP':
+                    leftEyeX = segment.x + 8; leftEyeY = segment.y + 6;
+                    rightEyeX = segment.x + 14; rightEyeY = segment.y + 6;
+                    break;
+                case 'DOWN':
+                    leftEyeX = segment.x + 8; leftEyeY = segment.y + 14;
+                    rightEyeX = segment.x + 14; rightEyeY = segment.y + 14;
+                    break;
+            }
+
             snakeCtx.beginPath();
-            snakeCtx.arc(x + 6, y + 6, eyeSize, 0, Math.PI * 2); // Left eye
-            snakeCtx.arc(x + 14, y + 6, eyeSize, 0, Math.PI * 2); // Right eye
+            snakeCtx.arc(leftEyeX, leftEyeY, eyeSize, 0, Math.PI * 2);
+            snakeCtx.arc(rightEyeX, rightEyeY, eyeSize, 0, Math.PI * 2);
             snakeCtx.fill();
         }
     }
+
+    snakeCtx.shadowBlur = 0;
 }
+
+window.stopSnakeGame = stopSnakeGame;
