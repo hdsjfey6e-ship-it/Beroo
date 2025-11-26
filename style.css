@@ -72,9 +72,16 @@ body {
     display: flex;
     justify-content: center;
     align-items: center;
-    gap: 2rem; /* Increased gap */
+    gap: 2rem;
     position: relative;
-    flex-wrap: wrap; /* Allow wrapping on small screens */
+    flex-wrap: wrap;
+}
+
+.user-welcome {
+    color: var(--primary-color);
+    font-weight: bold;
+    text-shadow: 0 0 10px currentColor;
+    font-size: 1.2rem;
 }
 
 .icon-btn {
@@ -89,8 +96,7 @@ body {
     display: flex;
     justify-content: center;
     align-items: center;
-    /* Removed absolute positioning to let it flow with gap */
-    position: relative; 
+    position: relative;
 }
 
 .icon-btn:hover {
@@ -267,11 +273,6 @@ footer {
     font-weight: bold;
 }
 
-.best-score span {
-    color: var(--secondary-color);
-    font-weight: bold;
-}
-
 /* Modal Styles */
 .modal {
     display: none;
@@ -302,7 +303,7 @@ footer {
 .close-modal {
     position: absolute;
     top: 10px;
-    left: 15px; /* RTL */
+    left: 15px;
     font-size: 1.5rem;
     cursor: pointer;
     color: #888;
@@ -326,7 +327,7 @@ footer {
 }
 
 .memory-grid.hard-grid {
-    grid-template-columns: repeat(6, 80px); /* 6 columns for Hard mode */
+    grid-template-columns: repeat(6, 80px);
 }
 
 .memory-card {
@@ -371,20 +372,6 @@ footer {
     background: rgba(255, 255, 255, 0.05);
     border: 2px solid var(--secondary-color);
     color: var(--secondary-color);
-}
-
-@media (max-width: 500px) {
-    .memory-grid {
-        grid-template-columns: repeat(4, 70px);
-        gap: 10px;
-    }
-    .memory-card {
-        width: 70px;
-        height: 70px;
-    }
-    .front-face, .back-face {
-        font-size: 1.5rem;
-    }
 }
 
 /* Snake Game Styles */
@@ -435,13 +422,6 @@ footer {
     background: var(--primary-color);
     color: #000;
     transform: scale(0.95);
-}
-
-/* Hide controls on desktop if preferred, or keep for all */
-@media (min-width: 769px) {
-    .snake-controls {
-        display: none; /* Use keyboard on desktop */
-    }
 }
 
 /* Tic Tac Toe Styles */
@@ -509,16 +489,6 @@ footer {
     text-shadow: 0 0 10px var(--secondary-color);
 }
 
-@media (max-width: 400px) {
-    .ttt-grid {
-        grid-template-columns: repeat(3, 80px);
-        grid-template-rows: repeat(3, 80px);
-    }
-    .ttt-cell {
-        font-size: 2.5rem;
-    }
-}
-
 .winning-cell {
     background: rgba(0, 255, 242, 0.3) !important;
     border-color: var(--primary-color) !important;
@@ -526,11 +496,34 @@ footer {
     transform: scale(1.05);
 }
 
+/* Flappy Bird Styles */
+.flappy-header {
+    text-align: center;
+    margin-bottom: 1rem;
+}
+
+#flappy-canvas {
+    background: rgba(0, 0, 0, 0.5);
+    border: 2px solid var(--primary-color);
+    box-shadow: 0 0 20px rgba(0, 255, 242, 0.2);
+    border-radius: 10px;
+    display: block;
+    margin: 0 auto;
+    max-width: 100%;
+}
+
+.flappy-controls {
+    margin-top: 1.5rem;
+    display: flex;
+    justify-content: center;
+}
+
+/* Responsive Design */
 @media (max-width: 600px) {
     .container {
         padding: 1rem;
         width: 100%;
-        overflow-x: hidden; /* Prevent horizontal scroll */
+        overflow-x: hidden;
     }
 
     .header-content {
@@ -539,42 +532,50 @@ footer {
         padding-bottom: 1rem;
     }
 
-    .logo h1 {
-        font-size: 2rem;
+    .user-welcome {
+        font-size: 0.9rem;
+        order: -1;
+        width: 100%;
+        text-align: center;
+        margin-bottom: 0.5rem;
     }
 
     .theme-picker {
-        margin: 0.5rem 0;
+        order: 2;
+    }
+
+    .icon-btn {
+        order: 3;
     }
 
     .game-grid {
-        grid-template-columns: 1fr; /* Stack cards on mobile */
+        grid-template-columns: 1fr;
         gap: 1.5rem;
     }
 
     /* Snake Canvas Responsive */
     #snake-canvas {
         width: 100%;
-        max-width: 350px; /* Limit max width */
-        height: auto; /* Maintain aspect ratio */
+        max-width: 350px;
+        height: auto;
         aspect-ratio: 1/1;
     }
 
     /* Memory Grid Responsive */
     .memory-grid {
-        grid-template-columns: repeat(4, 1fr); /* Use fraction to fit width */
+        grid-template-columns: repeat(4, 1fr);
         gap: 8px;
         max-width: 100%;
     }
     
     .memory-grid.hard-grid {
-        grid-template-columns: repeat(4, 1fr); /* 4 cols for hard mode on mobile */
+        grid-template-columns: repeat(4, 1fr);
     }
 
     .memory-card {
-        width: auto; /* Let grid define width */
+        width: auto;
         height: auto;
-        aspect-ratio: 1/1; /* Keep square */
+        aspect-ratio: 1/1;
     }
     
     .front-face, .back-face {
@@ -585,7 +586,7 @@ footer {
     .ttt-grid {
         grid-template-columns: repeat(3, 1fr);
         gap: 10px;
-        max-width: 300px; /* Limit width */
+        max-width: 300px;
     }
 
     .ttt-cell {
@@ -596,12 +597,29 @@ footer {
     }
     
     .horizontal-controls {
-        gap: 3rem; /* More space for thumbs */
+        gap: 3rem;
+    }
+    
+    /* Flappy Bird Responsive */
+    #flappy-canvas {
+        width: 100%;
+        max-width: 350px;
+        height: 500px;
     }
     
     /* Stats Modal on Mobile */
     .modal-content {
         width: 95%;
         padding: 1.5rem;
+    }
+}
+
+@media (max-width: 400px) {
+    .ttt-grid {
+        grid-template-columns: repeat(3, 80px);
+        grid-template-rows: repeat(3, 80px);
+    }
+    .ttt-cell {
+        font-size: 2.5rem;
     }
 }
