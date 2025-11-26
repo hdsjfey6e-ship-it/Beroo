@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>مركز الألعاب | Game Hub</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+    <!-- Font Awesome for Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <canvas id="particles-canvas"></canvas>
+
+    <div class="container">
+        <header>
+            <div class="header-content">
+                <h1><i class="fas fa-gamepad"></i> مركز ألعاب Beroo</h1>
+                
+                <div class="theme-picker">
+                    <div class="theme-btn" style="background: #00fff2;" onclick="setTheme('theme-cyan')"></div>
+                    <div class="theme-btn" style="background: #00ff00;" onclick="setTheme('theme-green')"></div>
+                    <div class="theme-btn" style="background: #ffd700;" onclick="setTheme('theme-gold')"></div>
+                    <div class="theme-btn" style="background: #ff0000;" onclick="setTheme('theme-red')"></div>
+                </div>
+
+                <button id="stats-btn" class="icon-btn" onclick="showStats()" title="الإنجازات">
+                    <i class="fas fa-trophy"></i>
+                </button>
+
+                <button id="sound-toggle" class="icon-btn" title="كتم/تشغيل الصوت">
+                    <i class="fas fa-volume-up"></i>
+                </button>
+            </div>
+        </header>
+
+        <!-- Landing Page / Game Selector -->
+        <div id="home-screen" class="glass-panel">
+            <h2>اختر لعبتك يا Beroo</h2>
+            <div class="game-grid">
+                <!-- Memory Game Card -->
+                <div class="game-card" onclick="loadGame('memory')">
+                    <i class="fas fa-brain fa-3x" style="color: var(--primary-color); margin-bottom: 1rem;"></i>
+                    <h3>لعبة الذاكرة</h3>
+                    <p>اختبر ذاكرتك وطابق البطاقات المتشابهة في أسرع وقت ممكن.</p>
+                    <span class="btn">العب الآن</span>
+                </div>
+
+                <!-- Snake Game Card -->
+                <div class="game-card" onclick="loadGame('snake')">
+                    <i class="fas fa-dragon fa-3x" style="color: var(--secondary-color); margin-bottom: 1rem;"></i>
+                    <h3>الثعبان</h3>
+                    <p>اللعبة الكلاسيكية بتصميم نيون جديد. اجمع النقاط وتجنب الاصطدام!</p>
+                    <span class="btn">العب الآن</span>
+                </div>
+
+                <!-- Tic Tac Toe Card -->
+                <div class="game-card" onclick="loadGame('tictactoe')">
+                    <i class="fas fa-times fa-3x" style="color: var(--accent-color); margin-bottom: 1rem;"></i>
+                    <h3>إكس أو</h3>
+                    <p>تحدى صديقك أو الكمبيوتر في لعبة الذكاء الخالدة.</p>
+                    <span class="btn">العب الآن</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Game Area (Dynamic Content) -->
+        <div id="game-area" class="glass-panel">
+            <button class="back-btn" onclick="goHome()">
+                <i class="fas fa-arrow-right"></i> القائمة الرئيسية
+            </button>
+            <div id="game-content">
+                <!-- Game HTML will be injected here -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Instructions Modal -->
+    <div id="instructions-modal" class="modal">
+        <div class="modal-content">
+            <span class="close-modal" onclick="closeInstructions()">&times;</span>
+            <h2 id="modal-title">طريقة اللعب</h2>
+            <p id="modal-text" style="line-height: 1.8; color: #ddd; margin-top: 1rem;"></p>
+        </div>
+    </div>
+
+    <!-- Stats Modal -->
+    <div id="stats-modal" class="modal">
+        <div class="modal-content">
+            <span class="close-modal" onclick="closeStats()">&times;</span>
+            <h2><i class="fas fa-trophy" style="color: gold;"></i> لوحة الإنجازات</h2>
+            <div id="stats-content" style="margin-top: 2rem; display: grid; gap: 1rem;">
+                <!-- Stats injected here -->
+            </div>
+        </div>
+    </div>
+
+    <footer>
+        <p>صنع بحب ❤️ لـ Beroo | 2025</p>
+    </footer>
+
+    <script src="script.js"></script>
+    <script src="games/memory.js"></script>
+    <script src="games/snake.js"></script>
+    <script src="games/tictactoe.js"></script>
+</body>
+</html>

@@ -1,0 +1,582 @@
+:root {
+    --bg-color: #0f0c29;
+    --bg-gradient: linear-gradient(300deg, #302b63, #24243e, #0f0c29);
+    --text-color: #ffffff;
+    --primary-color: #00fff2; /* Cyan Neon */
+    --secondary-color: #ff00de; /* Pink Neon */
+    --accent-color: #7b2cbf; /* Purple */
+    --glass-bg: rgba(255, 255, 255, 0.1);
+    --glass-border: rgba(255, 255, 255, 0.2);
+    --font-main: 'Outfit', sans-serif;
+}
+
+/* Themes */
+body.theme-cyan {
+    --primary-color: #00fff2;
+    --secondary-color: #ff00de;
+}
+
+body.theme-green {
+    --primary-color: #00ff00;
+    --secondary-color: #ccff00;
+}
+
+body.theme-gold {
+    --primary-color: #ffd700;
+    --secondary-color: #ff8c00;
+}
+
+body.theme-red {
+    --primary-color: #ff0000;
+    --secondary-color: #ff4500;
+}
+
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    font-family: var(--font-main);
+    background: var(--bg-color);
+    background-image: var(--bg-gradient);
+    background-size: 400% 400%;
+    animation: gradientBG 15s ease infinite;
+    color: var(--text-color);
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    overflow-x: hidden;
+    position: relative;
+}
+
+#particles-canvas {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: -1;
+    pointer-events: none;
+}
+
+@keyframes gradientBG {
+    0% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+    100% { background-position: 0% 50%; }
+}
+
+/* Typography */
+.header-content {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 2rem; /* Increased gap */
+    position: relative;
+    flex-wrap: wrap; /* Allow wrapping on small screens */
+}
+
+.icon-btn {
+    background: rgba(255, 255, 255, 0.1);
+    border: 1px solid var(--primary-color);
+    color: var(--primary-color);
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    cursor: pointer;
+    transition: all 0.3s;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    /* Removed absolute positioning to let it flow with gap */
+    position: relative; 
+}
+
+.icon-btn:hover {
+    background: var(--primary-color);
+    color: #000;
+    box-shadow: 0 0 15px var(--primary-color);
+}
+
+.theme-picker {
+    display: flex;
+    gap: 10px;
+    margin: 0 1rem;
+    background: rgba(255,255,255,0.1);
+    padding: 5px 10px;
+    border-radius: 20px;
+}
+
+.theme-btn {
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    cursor: pointer;
+    border: 2px solid transparent;
+    transition: transform 0.2s;
+}
+
+.theme-btn:hover {
+    transform: scale(1.2);
+    border-color: #fff;
+}
+
+h1, h2, h3 {
+    text-align: center;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    text-shadow: 0 0 10px var(--primary-color), 0 0 20px var(--primary-color);
+}
+
+h1 {
+    font-size: 3rem;
+    margin: 2rem 0;
+    background: linear-gradient(to right, var(--primary-color), var(--secondary-color));
+    background-clip: text;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+/* Glassmorphism Container */
+.container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 2rem;
+    flex: 1;
+}
+
+.glass-panel {
+    background: var(--glass-bg);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border: 1px solid var(--glass-border);
+    border-radius: 20px;
+    padding: 2rem;
+    box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+}
+
+/* Game Selector Grid */
+.game-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 2rem;
+    margin-top: 2rem;
+}
+
+.game-card {
+    background: rgba(0, 0, 0, 0.3);
+    border-radius: 15px;
+    padding: 2rem;
+    text-align: center;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    cursor: pointer;
+    border: 1px solid transparent;
+    position: relative;
+    overflow: hidden;
+}
+
+.game-card:hover {
+    transform: translateY(-10px);
+    box-shadow: 0 0 20px var(--primary-color);
+    border-color: var(--primary-color);
+}
+
+.game-card h3 {
+    margin-bottom: 1rem;
+    font-size: 1.5rem;
+    color: var(--primary-color);
+}
+
+.game-card p {
+    color: #ccc;
+    margin-bottom: 1.5rem;
+    line-height: 1.6;
+}
+
+.btn {
+    display: inline-block;
+    padding: 0.8rem 2rem;
+    background: transparent;
+    border: 2px solid var(--secondary-color);
+    color: var(--text-color);
+    border-radius: 50px;
+    text-decoration: none;
+    font-weight: bold;
+    transition: all 0.3s ease;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+.btn:hover {
+    background: var(--secondary-color);
+    box-shadow: 0 0 15px var(--secondary-color);
+}
+
+/* Game Container (Hidden by default) */
+#game-area {
+    display: none;
+    flex-direction: column;
+    align-items: center;
+    width: 100%;
+}
+
+.back-btn {
+    align-self: flex-start;
+    margin-bottom: 1rem;
+    cursor: pointer;
+    font-size: 1.2rem;
+    color: var(--text-color);
+    background: none;
+    border: none;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.back-btn:hover {
+    color: var(--primary-color);
+}
+
+/* Footer */
+footer {
+    text-align: center;
+    padding: 1rem;
+    background: rgba(0, 0, 0, 0.5);
+    margin-top: auto;
+    color: #888;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    h1 { font-size: 2rem; }
+    .game-grid { grid-template-columns: 1fr; }
+}
+
+/* Score Board Styles */
+.score-board {
+    display: flex;
+    justify-content: center;
+    gap: 2rem;
+    margin-bottom: 1rem;
+    font-size: 1.2rem;
+}
+
+.best-score span {
+    color: var(--secondary-color);
+    font-weight: bold;
+}
+
+.best-score span {
+    color: var(--secondary-color);
+    font-weight: bold;
+}
+
+/* Modal Styles */
+.modal {
+    display: none;
+    position: fixed;
+    z-index: 1000;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0,0,0,0.7);
+    backdrop-filter: blur(5px);
+    justify-content: center;
+    align-items: center;
+}
+
+.modal-content {
+    background: var(--bg-color);
+    border: 2px solid var(--primary-color);
+    border-radius: 15px;
+    padding: 2rem;
+    max-width: 500px;
+    width: 90%;
+    text-align: center;
+    position: relative;
+    box-shadow: 0 0 30px rgba(0, 255, 242, 0.2);
+}
+
+.close-modal {
+    position: absolute;
+    top: 10px;
+    left: 15px; /* RTL */
+    font-size: 1.5rem;
+    cursor: pointer;
+    color: #888;
+}
+
+.close-modal:hover {
+    color: #fff;
+}
+
+/* Memory Game Styles */
+.memory-header {
+    text-align: center;
+    margin-bottom: 1rem;
+}
+
+.memory-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 100px);
+    gap: 15px;
+    perspective: 1000px;
+}
+
+.memory-grid.hard-grid {
+    grid-template-columns: repeat(6, 80px); /* 6 columns for Hard mode */
+}
+
+.memory-card {
+    width: 100px;
+    height: 100px;
+    position: relative;
+    transform-style: preserve-3d;
+    transition: transform 0.5s;
+    cursor: pointer;
+}
+
+.memory-card.small {
+    width: 80px;
+    height: 80px;
+}
+
+.memory-card.flip {
+    transform: rotateY(180deg);
+}
+
+.front-face, .back-face {
+    width: 100%;
+    height: 100%;
+    position: absolute;
+    border-radius: 10px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 2.5rem;
+    backface-visibility: hidden;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.3);
+}
+
+.front-face {
+    background: rgba(255, 255, 255, 0.1);
+    border: 2px solid var(--primary-color);
+    color: var(--primary-color);
+    transform: rotateY(180deg);
+}
+
+.back-face {
+    background: rgba(255, 255, 255, 0.05);
+    border: 2px solid var(--secondary-color);
+    color: var(--secondary-color);
+}
+
+@media (max-width: 500px) {
+    .memory-grid {
+        grid-template-columns: repeat(4, 70px);
+        gap: 10px;
+    }
+    .memory-card {
+        width: 70px;
+        height: 70px;
+    }
+    .front-face, .back-face {
+        font-size: 1.5rem;
+    }
+}
+
+/* Snake Game Styles */
+.snake-header {
+    text-align: center;
+    margin-bottom: 1rem;
+}
+
+#snake-canvas {
+    background: rgba(0, 0, 0, 0.5);
+    border: 2px solid var(--secondary-color);
+    box-shadow: 0 0 20px rgba(255, 0, 222, 0.2);
+    border-radius: 10px;
+    display: block;
+    margin: 0 auto;
+    max-width: 100%;
+}
+
+.snake-controls {
+    margin-top: 1.5rem;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.horizontal-controls {
+    display: flex;
+    gap: 3rem;
+}
+
+.btn-control {
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.1);
+    border: 2px solid var(--primary-color);
+    color: var(--primary-color);
+    font-size: 1.5rem;
+    cursor: pointer;
+    transition: all 0.2s;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.btn-control:active {
+    background: var(--primary-color);
+    color: #000;
+    transform: scale(0.95);
+}
+
+/* Hide controls on desktop if preferred, or keep for all */
+@media (min-width: 769px) {
+    .snake-controls {
+        display: none; /* Use keyboard on desktop */
+    }
+}
+
+/* Tic Tac Toe Styles */
+.ttt-header {
+    text-align: center;
+    margin-bottom: 2rem;
+}
+
+.ttt-controls {
+    margin: 1rem 0;
+    display: flex;
+    justify-content: center;
+    gap: 1rem;
+}
+
+.btn-sm {
+    background: transparent;
+    border: 1px solid var(--text-color);
+    color: var(--text-color);
+    padding: 0.5rem 1rem;
+    border-radius: 20px;
+    cursor: pointer;
+    transition: all 0.3s;
+}
+
+.btn-sm.active, .btn-sm:hover {
+    background: var(--accent-color);
+    border-color: var(--accent-color);
+    box-shadow: 0 0 10px var(--accent-color);
+}
+
+.ttt-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 100px);
+    grid-template-rows: repeat(3, 100px);
+    gap: 10px;
+    margin: 0 auto;
+}
+
+.ttt-cell {
+    background: rgba(255, 255, 255, 0.05);
+    border: 2px solid rgba(255, 255, 255, 0.1);
+    border-radius: 15px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 3rem;
+    font-weight: bold;
+    cursor: pointer;
+    transition: all 0.3s;
+}
+
+.ttt-cell:hover {
+    background: rgba(255, 255, 255, 0.1);
+    border-color: var(--primary-color);
+}
+
+.ttt-cell.x {
+    color: var(--primary-color);
+    text-shadow: 0 0 10px var(--primary-color);
+}
+
+.ttt-cell.o {
+    color: var(--secondary-color);
+    text-shadow: 0 0 10px var(--secondary-color);
+}
+
+@media (max-width: 400px) {
+    .ttt-grid {
+        grid-template-columns: repeat(3, 80px);
+        grid-template-rows: repeat(3, 80px);
+    }
+    .ttt-cell {
+        font-size: 2.5rem;
+    }
+}
+
+.winning-cell {
+    background: rgba(0, 255, 242, 0.3) !important;
+    border-color: var(--primary-color) !important;
+    box-shadow: 0 0 20px var(--primary-color);
+    transform: scale(1.05);
+}
+
+@media (max-width: 600px) {
+    .header-content {
+        flex-direction: column;
+        gap: 1rem;
+    }
+
+    .game-grid {
+        grid-template-columns: 1fr; /* Stack cards on mobile */
+    }
+
+    /* Snake Canvas Responsive */
+    #snake-canvas {
+        width: 100%;
+        max-width: 350px; /* Limit max width */
+        height: auto; /* Maintain aspect ratio */
+        aspect-ratio: 1/1;
+    }
+
+    /* Memory Grid Responsive */
+    .memory-grid {
+        grid-template-columns: repeat(4, 70px); /* Smaller cards */
+        gap: 10px;
+    }
+    
+    .memory-grid.hard-grid {
+        grid-template-columns: repeat(4, 60px); /* 4 cols for hard mode on mobile, will wrap */
+    }
+
+    .memory-card {
+        width: 70px;
+        height: 70px;
+    }
+    
+    .memory-card.small {
+        width: 60px;
+        height: 60px;
+    }
+
+    /* Tic Tac Toe Responsive */
+    .ttt-grid {
+        grid-template-columns: repeat(3, 80px);
+        gap: 10px;
+    }
+
+    .ttt-cell {
+        width: 80px;
+        height: 80px;
+        font-size: 2.5rem;
+    }
+    
+    .horizontal-controls {
+        gap: 3rem; /* More space for thumbs */
+    }
+}
